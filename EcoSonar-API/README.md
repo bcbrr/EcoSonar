@@ -150,11 +150,12 @@ Then choose among the variables below the ones required and add it into `.env` f
 
 #### Database configuration : MongoDB Atlas or CosmosDB
 Add the following environment variables in your Application Configuration:
-  - ECOSONAR_ENV_DB_TYPE : MongoDB Type Chosen to store EcoSonar audits. ECOSONAR_ENV_DB_TYPE can take two attributes by default : `MongoDB_Atlas` and `CosmosDB`.
+  - ECOSONAR_ENV_DB_TYPE : MongoDB Type Chosen to store EcoSonar audits. ECOSONAR_ENV_DB_TYPE can take three attributes by default : `MongoDB_Atlas`, `CosmosDB` or `MongoDB`.
   - ECOSONAR_ENV_USER (user created when initalizing MongoDB database)
   - ECOSONAR_ENV_CLUSTER (cluster name of your MongoDB database)
   - ECOSONAR_ENV_DB_NAME (database name: 'EcoSonar' for example)
   - ECOSONAR_ENV_DB_PORT (port used by your MongoDB database)
+  - ECOSONAR_ENV_DB_SERVER_PARAMETERS (additional server parameters string)
   - ECOSONAR_ENV_CLOUD_PROVIDER : Cloud Provider used to deploy EcoSonar API. By default, this parameter can take two values : `AZURE` or `local`. It will be used to retrieve the database password.
 
 #### Other database configuration possible

@@ -4,45 +4,53 @@ const { retrievePassword } = require('./retrieveDatabasePasswordFromCloudProvide
 class DataBase {
 }
 DataBase.prototype.connection = async function () {
-  let connectionString
-  let user
-  let password
-  let dbName
-  let cluster
+  let protocol = 'mongodb'
+  let options = {}
+  let serverParameters = (process.env.ECOSONAR_ENV_DB_SERVER_PARAMETERS || '')
+      .split('&')
+      .filter(parameter => parameter.length > 0)
+
   const mongoDBType = process.env.ECOSONAR_ENV_DB_TYPE || ''
+  const user = process.env.ECOSONAR_ENV_USER || ''
+  const password = await retrievePassword()
+  const cluster = process.env.ECOSONAR_ENV_CLUSTER || ''
+  const port = process.env.ECOSONAR_ENV_DB_PORT || ''
+  const dbName = process.env.ECOSONAR_ENV_DB_NAME || ''
 
   if (mongoDBType === 'MongoDB_Atlas') {
-    user = process.env.ECOSONAR_ENV_USER || ''
-    password = await retrievePassword()
-    cluster = process.env.ECOSONAR_ENV_CLUSTER || ''
-    dbName = process.env.ECOSONAR_ENV_DB_NAME || ''
-    connectionString = `mongodb+srv://${user}:${password}@${cluster}/${dbName}?retryWrites=true&w=majority`
-    mongoose.connect(connectionString,
-      { useNewUrlParser: true, useUnifiedTopology: true }
-    ).then(() => console.log('Connection to MongoDB Atlas successful'))
-      .catch((reason) => console.error('\x1b[31m%s\x1b[0m', 'Unable to connect to the mongodb instance. Error: ', reason))
-  } else if (mongoDBType === 'CosmosDB') {
-    // connection to dataBase Azure CosmosDB for MongoDB API
-    cluster = process.env.ECOSONAR_ENV_CLUSTER || ''
-    const port = process.env.ECOSONAR_ENV_DB_PORT || 0
-    dbName = process.env.ECOSONAR_ENV_DB_NAME || ''
-    user = process.env.ECOSONAR_ENV_USER || ''
-    password = await retrievePassword()
-    connectionString = 'mongodb://' + cluster + ':' + port + '/' + dbName + '?ssl=true&replicaSet=globaldb'
-    mongoose.connect(connectionString, {
-      auth: {
-        username: user,
-        password
-      },
+    protocol = 'mongodb+srv'
+    options = {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      retryWrites: false
-    })
-      .then(() => console.log('Connection to CosmosDB successful'))
-      .catch((err) => console.error('\x1b[31m%s\x1b[0m', err))
+    }
+    serverParameters.push('retryWrites=true')
+    serverParameters.push('w=majority')
+  } else if (mongoDBType === 'CosmosDB') {
+    options = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      retryWrites: false,
+    }
+    serverParameters.push('sl=true')
+    serverParameters.push('replicaSet=globaldb')
+  } else if (mongoDBType === 'MongoDB') {
   } else {
-    console.log('Could not connect to any database')
+    console.log('Could not connect to any database, unknown database type')
+    return
   }
+
+  const connectionString = protocol + '://'
+    + user
+    + (password !== '' ? (':' + password) : '')
+    + ((user !== '' || password !== '') ? '@' : '')
+    + cluster
+    + (port !== '' ? (':' + port) : '')
+    + '/' + dbName
+    + (serverParameters.length > 0 ? ('?' + serverParameters.join('&')) : '')
+
+  mongoose.connect(connectionString, options)
+      .then(() => console.log(`Connection to ${mongoDBType} successful`))
+      .catch((reason) => console.error('\x1b[31m%s\x1b[0m', 'Unable to connect to the mongodb instance. Error: ', reason))
 }
 
 const bdd = new DataBase()
