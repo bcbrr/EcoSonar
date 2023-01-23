@@ -1,5 +1,5 @@
 
-const SystemError = require('../utils/SystemError')
+const SystemError = require('../utils/systemError')
 const w3cs = require('./models/w3cs')
 const urlsprojects = require('./models/urlsprojects')
 const formatW3cAnalysis = require('../services/format/formatW3cAnalysis')

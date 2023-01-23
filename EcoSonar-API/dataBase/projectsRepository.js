@@ -1,5 +1,5 @@
 const projects = require('./models/projects')
-const SystemError = require('../utils/SystemError')
+const SystemError = require('../utils/systemError')
 
 const ProjectsRepository = function () {
   /**

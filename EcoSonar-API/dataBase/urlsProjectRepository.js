@@ -4,7 +4,7 @@ const greenits = require('./models/greenits')
 const bestpractices = require('./models/bestpractices')
 const w3cs = require('./models/w3cs')
 const lighthouses = require('./models/lighthouses')
-const SystemError = require('../utils/SystemError')
+const SystemError = require('../utils/systemError')
 
 const UrlsProjectRepository = function () {
   /**
